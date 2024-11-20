@@ -8,11 +8,8 @@ export class LoggerMiddleware implements NestMiddleware {
     const authHeader = req.headers['authorization'] || 'No Authorization Header';
     const requestBody = req.method === 'POST' ? JSON.stringify(req.body) : 'No Body';
     const time = new Date().toISOString();
-    
-    // Prepare the log message
     const logMessage = `📌 [${time}] [${method}] >> [${originalUrl}] [Authorization: ${authHeader}]`;
     
-    // Log the body only for POST requests
     if (method === 'POST') {
       console.log(`${logMessage} -> ${requestBody}`);
     } else {

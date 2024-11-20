@@ -30,6 +30,7 @@ import { TokenCleanupService } from './token-cleanup.service';
   providers: [AuthService, TokenCleanupService, JwtStrategy],
   controllers: [AuthController],
 })
+
 export class AuthModule {
   constructor(private tokenCleanupService: TokenCleanupService) {
     const job = this.cleanupExpiredTokens.bind(this);

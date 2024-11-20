@@ -1,12 +1,10 @@
-import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
-import { UsersService } from '../users/users.service';
-import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { LoginDTO } from 'src/dtos/auth/login.dto';
-import { UserDTO } from 'src/dtos/users/user.dto';
-import { log } from 'console';
+import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -20,15 +18,14 @@ export class AuthService {
     if (!passwordMatch) throw new HttpException("Invalid credentials", 401);
     
     const payload = { email: user.email, id: user.id };
-    const token = this.jwtService.sign(payload);
-    const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 1);
+    const expiresIn = 30 * 24 * 60 * 60;
+    const token = this.jwtService.sign( payload, { expiresIn });
 
     this.prisma.token.create({
         data: {
             userId: user.id,
             token: token,
-            expiresAt: expiresAt
+            expiresAt: new Date(Date.now() + expiresIn * 1000)
         }
     });
 
