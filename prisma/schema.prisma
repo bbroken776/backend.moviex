@@ -8,13 +8,15 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String   @unique
-  role      String   @default("USER")
-  password  String
-  tokens    Token[]
+  id              Int     @id @default(autoincrement())
+  firstName       String
+  lastName        String
+  email           String  @unique
+  role            String  @default("USER")
+  password        String
+  tokens          Token[]
+  favoritedMovies Movie[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -30,4 +32,21 @@ model Token {
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("tokens")
+}
+
+model Movie {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  genres      String
+  year        Int
+  duration    Int
+  poster      String
+  banner      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[]
+
+  @@map("movies")
 }

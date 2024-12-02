@@ -21,7 +21,7 @@ export class AuthService {
     const expiresIn = 30 * 24 * 60 * 60;
     const token = this.jwtService.sign( payload, { expiresIn });
 
-    this.prisma.token.create({
+    await this.prisma.token.create({
         data: {
             userId: user.id,
             token: token,

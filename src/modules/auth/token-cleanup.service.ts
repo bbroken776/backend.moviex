@@ -15,4 +15,19 @@ export class TokenCleanupService {
       },
     });
   }
+
+  async verifyToken(token: string) {
+    const now = new Date();
+    const tokenRecord = await this.prisma.token.findUnique({
+      where: {
+        token,
+      },
+    });
+
+    if (!tokenRecord || tokenRecord.expiresAt < now) {
+      return false;
+    }
+
+    return true;
+  }
 }

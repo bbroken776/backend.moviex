@@ -11,6 +11,7 @@ import { UsersModule } from './modules/users/users.module';
 
 import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './modules/prisma/prisma.module';
+import { MoviesModule } from './modules/movies/movies.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
     UsersModule,
     AuthModule,
     PrismaModule,
+    MoviesModule,
   ],
 })
 export class AppModule {}
