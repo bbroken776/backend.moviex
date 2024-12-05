@@ -9,7 +9,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MoviesModule } from './modules/movies/movies.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
-import { UploadsModule } from './modules/uploads/uploads.module';
 
 @Module({
   imports: [
@@ -23,7 +22,6 @@ import { UploadsModule } from './modules/uploads/uploads.module';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
-    UploadsModule,
   ],
 })
 export class AppModule {}

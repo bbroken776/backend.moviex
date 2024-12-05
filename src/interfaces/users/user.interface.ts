@@ -1,10 +1,10 @@
-export interface IUser {
+export default interface IUser {
   id: number;
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
   password: string;
-  createdAt: Date;
-  updatedAt: Date;
+  role: 'USER' | 'ADMIN';
+  createdAt: string;
+  updatedAt: string;
 }

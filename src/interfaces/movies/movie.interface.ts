@@ -5,8 +5,11 @@ export default interface IMovie {
   genres: string[];
   year: number;
   duration: number;
+
   poster: string;
   banner: string;
+
+  likes: number;
 
   createdAt?: Date;
   updatedAt?: Date;

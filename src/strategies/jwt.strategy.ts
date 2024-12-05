@@ -17,11 +17,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.get<string>('JWT_SECRET'),
-      ignoreExpiration: false, 
+      ignoreExpiration: false,
     });
   }
 
-  async validate({ email, id }: { email: string, id: number }): Promise<UserDTO> {    
+  async validate({ email, id }: { email: string; id: number }): Promise<UserDTO> {
     return (await this.usersService.findByEmail(email)) || (await this.usersService.findById(id));
   }
 }

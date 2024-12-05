@@ -8,25 +8,29 @@ import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService, private jwtService: JwtService, private prisma: PrismaService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {}
 
   async login(data: LoginDTO) {
     const user = await this.usersService.findByEmail(data.email);
-    if (!user) throw new HttpException("Could not find any user with that email", 401);
-    
+    if (!user) throw new HttpException('Could not find any user with that email', 401);
+
     const passwordMatch = await this.usersService.validatePassword(data.email, data.password);
-    if (!passwordMatch) throw new HttpException("Invalid credentials", 401);
-    
+    if (!passwordMatch) throw new HttpException('Invalid credentials', 401);
+
     const payload = { email: user.email, id: user.id };
     const expiresIn = 30 * 24 * 60 * 60;
-    const token = this.jwtService.sign( payload, { expiresIn });
+    const token = this.jwtService.sign(payload, { expiresIn });
 
     await this.prisma.token.create({
-        data: {
-            userId: user.id,
-            token: token,
-            expiresAt: new Date(Date.now() + expiresIn * 1000)
-        }
+      data: {
+        userId: user.id,
+        token: token,
+        expiresAt: new Date(Date.now() + expiresIn * 1000),
+      },
     });
 
     return {

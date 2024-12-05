@@ -42,16 +42,13 @@ export class UsersService {
     if (!users) throw new HttpException('No users found', 404);
 
     return users.map(user => plainToClass(UserDTO, user));
-}
+  }
 
   async update(id: number, data: CreateUserDTO): Promise<IUser> {
     return this.prisma.user.update({ where: { id }, data });
   }
 
-  async validatePassword(
-    email: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
+  async validatePassword(email: string, hashedPassword: string): Promise<boolean> {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) throw new HttpException('User not found', 404);
 

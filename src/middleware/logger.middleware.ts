@@ -9,7 +9,7 @@ export class LoggerMiddleware implements NestMiddleware {
     const requestBody = req.method === 'POST' ? JSON.stringify(req.body) : 'No Body';
     const time = new Date().toISOString();
     const logMessage = `📌 [${time}] [${method}] >> [${originalUrl}] [Authorization: ${authHeader}]`;
-    
+
     if (method === 'POST') {
       console.log(`${logMessage} -> ${requestBody}`);
     } else {

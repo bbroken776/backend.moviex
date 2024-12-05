@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Put,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common';
 
 import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
 import { UserDTO } from 'src/dtos/users/user.dto';
@@ -46,10 +38,7 @@ export class UsersController {
   }
 
   @Put(':id')
-  async update(
-    id: number,
-    @Body() createUserDTO: CreateUserDTO,
-  ): Promise<UserDTO> {
+  async update(id: number, @Body() createUserDTO: CreateUserDTO): Promise<UserDTO> {
     return await this.usersService.update(id, createUserDTO);
   }
 }
