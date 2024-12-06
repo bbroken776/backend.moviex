@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  HttpStatus,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -6,6 +16,7 @@ import { CreateMovieDTO } from 'src/dtos/movies/create-movie.dto';
 import { MovieDTO } from 'src/dtos/movies/movie.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { MoviesService } from './movies.service';
+import responseHelper from 'src/helpers/responde.helper';
 
 @Controller('movies')
 export class MoviesController {
@@ -41,28 +52,32 @@ export class MoviesController {
     @Body() createMovieDTO: CreateMovieDTO,
     @UploadedFile('poster') poster: File,
     @UploadedFile('banner') banner: File,
-  ): Promise<MovieDTO> {
+  ) {
     const movieData = {
       ...createMovieDTO,
       posterPath: poster ? `uploads/posters/${poster.name}` : undefined,
       bannerPath: banner ? `uploads/banners/${banner.name}` : undefined,
     };
 
-    return await this.moviesService.create(movieData);
+    await this.moviesService.create(movieData);
+    return responseHelper(HttpStatus.CREATED, 'Movie created successfully');
   }
 
   @Get()
-  async findAll(): Promise<MovieDTO[]> {
-    return await this.moviesService.findAll();
+  async findAll() {
+    const movies = await this.moviesService.findAll();
+    return responseHelper(HttpStatus.OK, 'Movies fetched successfully', { movies });
   }
 
   @Get('/most-liked')
-  async findMostLiked(): Promise<MovieDTO[]> {
-    return await this.moviesService.findMostLiked();
+  async findMostLiked() {
+    const movies = await this.moviesService.findMostLiked();
+    return responseHelper(HttpStatus.OK, 'Most liked movies fetched successfully', { movies });
   }
 
   @Get(':id')
-  async findById(@Param('id') id: number): Promise<MovieDTO> {
-    return await this.moviesService.findById(id);
+  async findById(@Param('id') id: number) {
+    const movie = await this.moviesService.findById(id);
+    return responseHelper(HttpStatus.OK, 'Movie fetched successfully', { movie });
   }
 }

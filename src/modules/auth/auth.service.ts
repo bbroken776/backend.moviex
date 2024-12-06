@@ -4,6 +4,7 @@ import { LoginDTO } from 'src/dtos/auth/login.dto';
 import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
 import { UsersService } from '../users/users.service';
+import { UserDTO } from 'src/dtos/users/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
   ) {}
 
   async login(data: LoginDTO) {
-    const user = await this.usersService.findByEmail(data.email);
+    const user: UserDTO = await this.usersService.findByEmail(data.email);
     if (!user) throw new HttpException('Could not find any user with that email', 401);
 
     const passwordMatch = await this.usersService.validatePassword(data.email, data.password);

@@ -11,36 +11,36 @@ export class MoviesService {
 
   async create(data: CreateMovieDTO): Promise<MovieDTO> {
     const existsMovie = await this.prisma.movie.findFirst({ where: { title: data.title } });
-    if (existsMovie) throw new HttpException('There\'s already a movie with this title', 400);
+    if (existsMovie) {
+      throw new HttpException("There's already a movie with this title", 400);
+    }
 
-    const movie = await this.prisma.movie.create({ data: this.compressMovieForCreation(data) });
-    return plainToClass(MovieDTO, this.decompressMovie(movie));
+    const movie = await this.prisma.movie.create({ data });
+    return this.decompressMovie(movie);
   }
 
   async findById(id: number): Promise<MovieDTO> {
-    const movie: Movie | null = await this.prisma.movie.findUnique({ where: { id } });
+    const movie = await this.prisma.movie.findUnique({ where: { id } });
     if (!movie) throw new HttpException('Movie not found', 404);
-
     return this.decompressMovie(movie);
   }
 
   async findAll(): Promise<MovieDTO[]> {
-    const movies: Movie[] = await this.prisma.movie.findMany();
+    const movies = await this.prisma.movie.findMany();
     if (!movies) throw new HttpException('No movies found', 404);
-
     return movies.map(movie => this.decompressMovie(movie));
   }
 
   async findMostLiked(): Promise<MovieDTO[]> {
-    const movies: Movie[] = await this.prisma.movie.findMany({ orderBy: { likes: 'desc' }, take: 5 });
+    const movies = await this.prisma.movie.findMany({ orderBy: { likes: 'desc' }, take: 5 });
     if (!movies) throw new HttpException('No movies found', 404);
-
     return movies.map(movie => this.decompressMovie(movie));
   }
 
-  compressMovieForCreation(data: CreateMovieDTO): Partial<MovieCreateInput> {
-    const genres = data.genres.join(', ');
-    return { 
+  private decompressMovie(data: Movie): MovieDTO {
+    const genres = data.genres.split(',').map(genre => genre.trim());
+    return {
+      id: data.id,
       title: data.title,
       description: data.description,
       genres,
@@ -49,12 +49,9 @@ export class MoviesService {
       poster: data.poster,
       banner: data.banner,
       source: data.source,
-      likes: data.likes || 0,
+      likes: data.likes,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
     };
-  }
-  
-  decompressMovie(data: Movie): MovieDTO {
-    const genres = data.genres.split(',').map(genre => genre.trim());
-    return { ...data, genres } as MovieDTO;
   }
 }
