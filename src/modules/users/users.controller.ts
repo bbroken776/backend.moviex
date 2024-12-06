@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common';
 
-import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
-import { UserDTO } from 'src/dtos/users/user.dto';
 import { JwtAuthGuard } from '../../guards/jwt.guard';
 import { UsersService } from './users.service';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { UserDTO } from 'src/dtos/users/user.dto';
+import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
 
 @Controller('users')
 export class UsersController {

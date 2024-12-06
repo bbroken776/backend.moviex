@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
 import { LoginDTO } from 'src/dtos/auth/login.dto';
 import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -25,27 +24,34 @@ export class AuthService {
     const expiresIn = 30 * 24 * 60 * 60;
     const token = this.jwtService.sign(payload, { expiresIn });
 
+    const expirationDate = new Date(Date.now() + expiresIn * 1000);
     await this.prisma.token.create({
       data: {
         userId: user.id,
         token: token,
-        expiresAt: new Date(Date.now() + expiresIn * 1000),
+        expiresAt: expirationDate,
       },
     });
 
-    return {
-      user,
-      token,
-    };
+    return { user, token };
   }
 
   async register(createUserDto: CreateUserDTO) {
     const user = await this.usersService.create(createUserDto);
     const payload = { email: user.email, id: user.id };
 
-    return {
-      user,
-      token: this.jwtService.sign(payload),
-    };
+    const expiresIn = 30 * 24 * 60 * 60;
+    const token = this.jwtService.sign(payload, { expiresIn });
+
+    const expirationDate = new Date(Date.now() + expiresIn * 1000);
+    await this.prisma.token.create({
+      data: {
+        userId: user.id,
+        token: token,
+        expiresAt: expirationDate,
+      },
+    });
+
+    return { user, token };
   }
 }

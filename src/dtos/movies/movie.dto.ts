@@ -5,8 +5,12 @@ export class MovieDTO {
   genres: string[];
   year: number;
   duration: number;
+
   poster: string;
   banner: string;
+  source: string;
+
+  likes: number;
 
   createdAt?: Date;
   updatedAt?: Date;

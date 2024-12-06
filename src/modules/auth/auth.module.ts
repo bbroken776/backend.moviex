@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { PrismaModule } from 'src/modules/prisma/prisma.module';
+import { JwtStrategy } from '../../strategies/jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from '../../strategies/jwt.strategy';
-import { ScheduleModule } from '@nestjs/schedule';
 import { TokenCleanupService } from './token-cleanup.service';
 
 @Module({

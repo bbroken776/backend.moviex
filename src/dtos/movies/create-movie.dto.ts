@@ -7,8 +7,8 @@ export class CreateMovieDTO {
   @IsString()
   description: string;
 
-  @IsString({ each: true })
-  genres: string[];
+  @IsString()
+  genres: string;
 
   @IsNumber()
   year: number;
@@ -21,4 +21,10 @@ export class CreateMovieDTO {
 
   @IsString()
   banner: string;
+
+  @IsString()
+  source: string;
+
+  @IsNumber()
+  likes?: number;
 }

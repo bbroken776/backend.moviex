@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id          Int     @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  email       String  @unique
-  role        String  @default("USER")
-  password    String
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  role      String   @default("USER") 
+  password  String
+
+  likedMovies Movie[] @relation("UserLikesMovie")
   tokens      Token[]
-  likedMovies Movie[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -27,9 +28,10 @@ model Token {
   id        Int      @id @default(autoincrement())
   userId    Int
   token     String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+
   expiresAt DateTime
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
 
   @@map("tokens")
 }
@@ -41,15 +43,16 @@ model Movie {
   genres      String
   year        Int
   duration    Int
+  
   poster      String
   banner      String
   source      String
 
-  likes Int @default(0)
+  likes       Int    @default(0)
+  likedBy     User[] @relation("UserLikesMovie")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User[]
 
   @@map("movies")
 }

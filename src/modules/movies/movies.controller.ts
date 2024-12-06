@@ -5,7 +5,6 @@ import { extname } from 'path';
 import { CreateMovieDTO } from 'src/dtos/movies/create-movie.dto';
 import { MovieDTO } from 'src/dtos/movies/movie.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
-import MulterFile from 'src/interfaces/movies/multerfile.interface';
 import { MoviesService } from './movies.service';
 
 @Controller('movies')
@@ -40,13 +39,13 @@ export class MoviesController {
   )
   async create(
     @Body() createMovieDTO: CreateMovieDTO,
-    @UploadedFile('poster') poster: MulterFile,
-    @UploadedFile('banner') banner: MulterFile,
+    @UploadedFile('poster') poster: File,
+    @UploadedFile('banner') banner: File,
   ): Promise<MovieDTO> {
     const movieData = {
       ...createMovieDTO,
-      posterPath: poster ? `uploads/posters/${poster.filename}` : undefined,
-      bannerPath: banner ? `uploads/banners/${banner.filename}` : undefined,
+      posterPath: poster ? `uploads/posters/${poster.name}` : undefined,
+      bannerPath: banner ? `uploads/banners/${banner.name}` : undefined,
     };
 
     return await this.moviesService.create(movieData);
