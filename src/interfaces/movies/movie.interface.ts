@@ -6,6 +6,7 @@ export default interface IMovie {
   year: number;
   duration: number;
 
+  source: string;
   poster: string;
   banner: string;
 
