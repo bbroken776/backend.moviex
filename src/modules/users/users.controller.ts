@@ -1,10 +1,12 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../../guards/jwt.guard';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
+
 import { AdminGuard } from 'src/guards/admin.guard';
+import { JwtAuthGuard } from '../../guards/jwt.guard';
 import { UsersService } from './users.service';
-import { UserDTO } from 'src/dtos/users/user.dto';
+
 import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
 import responseHelper from 'src/helpers/responde.helper';
+import { UserDTO } from 'src/dtos/users/user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -19,15 +21,9 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(AdminGuard)
   async findById(@Param('id') id: number) {
     const user = await this.usersService.findById(id);
-    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    return responseHelper(HttpStatus.OK, 'User found', { user });
-  }
-
-  @Get('email/:email')
-  async findByEmail(@Param('email') email: string) {
-    const user = await this.usersService.findByEmail(email);
     if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     return responseHelper(HttpStatus.OK, 'User found', { user });
   }
@@ -46,9 +42,17 @@ export class UsersController {
     return responseHelper(HttpStatus.CREATED, 'User created successfully', { user });
   }
 
-  @Put(':id')
-  async update(@Param('id') id: number, @Body() createUserDTO: CreateUserDTO) {
-    const user = await this.usersService.update(id, createUserDTO);
+  @Patch(':id')
+  @UseGuards(AdminGuard)
+  async update(@Param('id') id: number, @Body() userDTO: Partial<UserDTO>) {
+    const user = await this.usersService.update(id, userDTO);
     return responseHelper(HttpStatus.OK, 'User updated successfully', { user });
+  }
+
+  @Delete(':id')
+  @UseGuards(AdminGuard)
+  async delete(@Param('id') id: number) {
+    const user = await this.usersService.delete(id);
+    return responseHelper(HttpStatus.OK, 'User deleted successfully', { user });
   }
 }

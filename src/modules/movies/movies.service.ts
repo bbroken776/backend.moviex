@@ -34,6 +34,14 @@ export class MoviesService {
   async findMostLiked(): Promise<MovieDTO[]> {
     const movies = await this.prisma.movie.findMany({ orderBy: { likes: 'desc' }, take: 5 });
     if (!movies) throw new HttpException('No movies found', 404);
+    
+    return movies.map(movie => this.decompressMovie(movie));
+  }
+
+  async getRecentMovies(): Promise<MovieDTO[]> {
+    const movies = await this.prisma.movie.findMany({ orderBy: { createdAt: 'desc' }, take: 10 });
+    if (!movies) throw new HttpException('No movies found', 404);
+
     return movies.map(movie => this.decompressMovie(movie));
   }
 

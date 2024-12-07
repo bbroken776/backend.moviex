@@ -75,6 +75,12 @@ export class MoviesController {
     return responseHelper(HttpStatus.OK, 'Most liked movies fetched successfully', { movies });
   }
 
+  @Get('recent')
+  async getRecentMovies() {
+    const movies = await this.moviesService.getRecentMovies();
+    return responseHelper(HttpStatus.OK, 'Recent movies fetched successfully', { movies });
+  }
+
   @Get(':id')
   async findById(@Param('id') id: number) {
     const movie = await this.moviesService.findById(id);
