@@ -34,7 +34,7 @@ export class MoviesService {
   async findMostLiked(): Promise<MovieDTO[]> {
     const movies = await this.prisma.movie.findMany({ orderBy: { likes: 'desc' }, take: 5 });
     if (!movies) throw new HttpException('No movies found', 404);
-    
+
     return movies.map(movie => this.decompressMovie(movie));
   }
 
@@ -43,6 +43,20 @@ export class MoviesService {
     if (!movies) throw new HttpException('No movies found', 404);
 
     return movies.map(movie => this.decompressMovie(movie));
+  }
+
+  async likeMovie(movieId: number, userId: number): Promise<void> {
+    const movie = await this.prisma.movie.findUnique({ where: { id: movieId } });
+    if (!movie) throw new HttpException('Movie not found', 404);
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { likedMovies: true } });
+    if (!user) throw new HttpException('User not found', 404);
+
+    const alreadyLiked = user.likedMovies.some(likedMovie => likedMovie.id === movieId);
+    if (alreadyLiked) throw new HttpException('User already liked this movie', 400);
+
+    await this.prisma.movie.update({ where: { id: movieId }, data: { likes: movie.likes + 1 } });
+    await this.prisma.user.update({ where: { id: userId }, data: { likedMovies: { connect: { id: movieId } } } });
   }
 
   private decompressMovie(data: Movie): MovieDTO {

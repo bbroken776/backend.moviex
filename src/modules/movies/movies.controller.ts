@@ -2,21 +2,22 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Param,
   Post,
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { CreateMovieDTO } from 'src/dtos/movies/create-movie.dto';
-import { MovieDTO } from 'src/dtos/movies/movie.dto';
 import { AdminGuard } from 'src/guards/admin.guard';
-import { MoviesService } from './movies.service';
+import { JwtAuthGuard } from 'src/guards/jwt.guard';
 import responseHelper from 'src/helpers/responde.helper';
+import { MoviesService } from './movies.service';
+import { LikeMovieDto } from 'src/dtos/movies/like-movie.dto';
 
 @Controller('movies')
 export class MoviesController {
@@ -79,6 +80,13 @@ export class MoviesController {
   async getRecentMovies() {
     const movies = await this.moviesService.getRecentMovies();
     return responseHelper(HttpStatus.OK, 'Recent movies fetched successfully', { movies });
+  }
+
+  @Post('like')
+  @UseGuards(JwtAuthGuard)
+  async likeMovie(@Body() likeMovieDTO: LikeMovieDto) {
+    await this.moviesService.likeMovie(likeMovieDTO.movieId, likeMovieDTO.userId);
+    return responseHelper(HttpStatus.OK, 'Movie liked successfully');
   }
 
   @Get(':id')
