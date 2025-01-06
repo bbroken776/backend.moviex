@@ -19,4 +19,13 @@ export class AuthController {
     const { user, token } = await this.authService.register(createUserDto);
     return responseHelper(HttpStatus.CREATED, 'User created successfully', { user, token });
   }
+
+  @Post('authority')
+  async authority(@Body() body: { token: string }) {
+    const hasAuthority = await this.authService.authority(body.token);
+    return responseHelper(
+      hasAuthority ? HttpStatus.OK : HttpStatus.UNAUTHORIZED,
+      hasAuthority ? 'Authorized' : 'Unauthorized',
+    );
+  }
 }

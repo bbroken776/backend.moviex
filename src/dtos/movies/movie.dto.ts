@@ -10,7 +10,7 @@ export class MovieDTO {
   banner: string;
   source: string;
 
-  likes: number;
+  likes?: number;
 
   createdAt?: Date;
   updatedAt?: Date;

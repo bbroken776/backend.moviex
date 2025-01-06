@@ -33,6 +33,16 @@ export class UsersController {
     return responseHelper(HttpStatus.OK, 'User found', { user });
   }
 
+  @Get('me/liked-movies')
+  @UseGuards(JwtAuthGuard)
+  async likedMovies(@Request() req) {
+    const user = await this.usersService.findByEmail(req.user.email);
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    const likedMovies = await this.usersService.findLikedMovies(user);
+    return responseHelper(HttpStatus.OK, 'User found', { likedMovies });
+  }
+
   @Get(':id')
   @UseGuards(AdminGuard)
   async findById(@Param('id') id: number) {
@@ -56,10 +66,16 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @UseGuards(AdminGuard)
-  async update(@Param('id') id: number, @Body() userDTO: Partial<UserDTO>) {
+  @UseGuards(JwtAuthGuard)
+  async update(@Param('id') id: number, @Body() userDTO: Partial<UserDTO>, @Request() req) {
+    const authenticatedUserId = req.user.id;
+    const isAdmin = req.user.role === 'ADMIN';
+
+    if (authenticatedUserId !== id && !isAdmin)
+      return responseHelper(HttpStatus.FORBIDDEN, 'You are not allowed to update this user.');
+
     const user = await this.usersService.update(id, userDTO);
-    return responseHelper(HttpStatus.OK, 'User updated successfully', { user });
+    return responseHelper(HttpStatus.OK, 'User updated successfully');
   }
 
   @Delete(':id')

@@ -9,6 +9,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MoviesModule } from './modules/movies/movies.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
+import { DashboardController } from './modules/dashboard/dashboard.controller';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { PrismaModule } from './modules/prisma/prisma.module';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    DashboardModule,
   ],
+  controllers: [DashboardController],
 })
 export class AppModule {}

@@ -1,6 +1,11 @@
-import { IsNumber, IsString } from 'class-validator';
+import { Optional } from '@nestjs/common';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateMovieDTO {
+  @IsOptional()
+  @IsNumber()
+  id?: number;
+
   @IsString()
   title: string;
 
@@ -25,6 +30,7 @@ export class CreateMovieDTO {
   @IsString()
   source: string;
 
+  @IsOptional()
   @IsNumber()
   likes?: number;
 }

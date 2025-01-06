@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { plainToClass } from 'class-transformer';
+import { MovieDTO } from 'src/dtos/movies/movie.dto';
 import { CreateUserDTO } from 'src/dtos/users/create-user.dto';
 import { UserDTO } from 'src/dtos/users/user.dto';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -24,21 +25,24 @@ export class UsersService {
 
   async findById(id: number): Promise<UserDTO | null> {
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-
     return plainToClass(UserDTO, user);
   }
 
   async findByEmail(email: string): Promise<UserDTO | null> {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-
     return plainToClass(UserDTO, user);
   }
 
   async findAll(): Promise<UserDTO[]> {
     const users = await this.prisma.user.findMany();
     return users.map(user => plainToClass(UserDTO, user));
+  }
+
+  async findLikedMovies(user: User): Promise<MovieDTO[]> {
+   const completedUser = await this.prisma.user.findUnique({ where: { id: user.id }, include: { likedMovies: true } })
+    if (!completedUser) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+
+    return plainToClass(MovieDTO, completedUser.likedMovies);
   }
 
   async update(id: number, data: Partial<UserDTO>): Promise<UserDTO> {

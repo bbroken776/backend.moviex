@@ -16,12 +16,12 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://c9c1-2001-8a0-c78e-1f00-b5a4-6cad-6a80-90bf.ngrok-free.app'],
+    origin: ['http://localhost:3000'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization',
   });
-
+  
   await app.listen(process.env.PORT ?? 3333);
 }
 bootstrap();

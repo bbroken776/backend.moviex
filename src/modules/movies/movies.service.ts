@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Movie } from '@prisma/client';
-import { plainToClass } from 'class-transformer';
 import { CreateMovieDTO } from 'src/dtos/movies/create-movie.dto';
 import { MovieDTO } from 'src/dtos/movies/movie.dto';
 import { PrismaService } from 'src/modules/prisma/prisma.service';
@@ -11,12 +10,54 @@ export class MoviesService {
 
   async create(data: CreateMovieDTO): Promise<MovieDTO> {
     const existsMovie = await this.prisma.movie.findFirst({ where: { title: data.title } });
+
     if (existsMovie) {
       throw new HttpException("There's already a movie with this title", 400);
     }
 
-    const movie = await this.prisma.movie.create({ data });
+    const posterBytes = data.poster ? Buffer.from(data.poster, 'base64') : null;
+    const bannerBytes = data.banner ? Buffer.from(data.banner, 'base64') : null;
+
+    const movieData = {
+      ...data,
+      poster: posterBytes,
+      banner: bannerBytes,
+    };
+
+    const movie = await this.prisma.movie.create({ data: movieData });
     return this.decompressMovie(movie);
+  }
+
+  async update(id: number, data: Partial<CreateMovieDTO>): Promise<MovieDTO> {
+    const movie = await this.prisma.movie.findUnique({ where: { id } });
+    if (!movie) throw new HttpException('Movie not found', 404);
+  
+    let updatedData: Partial<Movie> = {};
+  
+    for (const key in data) {
+      if (data[key] !== undefined && data[key] !== movie[key]) {
+        updatedData[key] = data[key];
+      }
+    }
+  
+    if (Object.keys(updatedData).length === 0) {
+      throw new HttpException('No changes detected', 400);
+    }
+    
+    const updatedMovie = await this.prisma.movie.update({
+      where: { id },
+      data: updatedData,
+    });
+
+  
+    return this.decompressMovie(updatedMovie);
+  }
+
+  async delete(id: number): Promise<void> {
+    const movie = await this.prisma.movie.findUnique({ where: { id } });
+    if (!movie) throw new HttpException('Movie not found', 404);
+
+    await this.prisma.movie.delete({ where: { id } });
   }
 
   async findById(id: number): Promise<MovieDTO> {
@@ -28,6 +69,7 @@ export class MoviesService {
   async findAll(): Promise<MovieDTO[]> {
     const movies = await this.prisma.movie.findMany();
     if (!movies) throw new HttpException('No movies found', 404);
+
     return movies.map(movie => this.decompressMovie(movie));
   }
 
@@ -61,6 +103,7 @@ export class MoviesService {
 
   private decompressMovie(data: Movie): MovieDTO {
     const genres = data.genres.split(',').map(genre => genre.trim());
+
     return {
       id: data.id,
       title: data.title,
@@ -68,8 +111,8 @@ export class MoviesService {
       genres,
       year: data.year,
       duration: data.duration,
-      poster: data.poster,
-      banner: data.banner,
+      poster: data.poster ? data.poster.toString('base64') : null,
+      banner: data.banner ? data.banner.toString('base64') : null,
       source: data.source,
       likes: data.likes,
       createdAt: data.createdAt,

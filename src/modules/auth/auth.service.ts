@@ -55,4 +55,18 @@ export class AuthService {
 
     return { user, token };
   }
+
+  async authority(token: string) {
+    try {
+      const existsToken = await this.prisma.token.findUnique({ where: { token } });
+      if (!existsToken) return false;
+
+      const user = await this.usersService.findById(existsToken.userId);
+      if (!user) return false;
+
+      return user.role === 'ADMIN';
+    } catch (error) {
+      return false;
+    }
+  }
 }
